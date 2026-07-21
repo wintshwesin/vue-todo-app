@@ -2,12 +2,12 @@
   <div class="container mt-4">
     <h2 class="mb-3">ToDoリスト</h2>
 
-    <table class="table table-striped table-bordered table-hover align-middle">
+    <table v-if="items.length > 0"　class="table table-striped table-bordered table-hover align-middle text-center">
       <thead class="table-dark">
         <tr>
-          <th>ID</th>
+          <th @click="sortById" style="cursor:pointer"> ID ▲▼</th>
           <th>やること</th>
-          <th>期間</th>
+          <th @click="sortByDate" style="cursor:pointer">期間 ▲▼</th>
           <th>状態</th>
           <th>編集</th>
           <th>削除</th>
@@ -44,6 +44,10 @@
         </tr>
       </tbody>
     </table>
+    <!-- データがない場合 -->
+    <div v-else class="alert alert-info text-center">
+      リストデータがありません。
+    </div>
   </div>
   <div class="modal fade" id="deleteModal" tabindex="-1" ref="deleteModal">
   <div class="modal-dialog">
@@ -78,11 +82,30 @@
     const deleteModal = ref(null);
     let modal = null;
 
-    //console.log(items);
-
     onMounted(() => {
       modal = new Modal(deleteModal.value);
     });
+
+    const idAsc = ref(true);
+    const dateAsc = ref(true);
+
+    function sortById() {
+      items.value.sort((a, b) =>
+        idAsc.value ? a.id - b.id : b.id - a.id
+      );
+
+      idAsc.value = !idAsc.value;
+    }
+
+    function sortByDate() {
+      items.value.sort((a, b) =>
+        dateAsc.value
+          ? new Date(a.limit) - new Date(b.limit)
+          : new Date(b.limit) - new Date(a.limit)
+      );
+
+      dateAsc.value = !dateAsc.value;
+    }
 
     function onEdit(item) {
       if (!item.onEdit) {
