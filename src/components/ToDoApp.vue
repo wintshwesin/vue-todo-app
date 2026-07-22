@@ -1,13 +1,11 @@
 <script setup>
-import ToDoInput from './ToDoInput.vue';
-import ToDoListView from './ToDoListView.vue';
-import {ref} from "vue";
-import {statuses} from "../const/status";
-
+  import ToDoInput from './ToDoInput.vue';
+  import ToDoListView from './ToDoListView.vue';
 </script>
+
 <template>
-  <div class="todoApp">
-    <ToDoInput></ToDoInput>
-    <ToDoListView></ToDoListView>
+  <div class="todo-app">
+    <ToDoInput />
+    <ToDoListView />
   </div>
 </template>

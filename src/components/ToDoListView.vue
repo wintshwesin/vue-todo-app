@@ -73,67 +73,81 @@
 </template>
 
 <script setup>
-    import { ref, onMounted } from "vue";
-    import { statuses } from "@/const/status";
-    import { Modal } from "bootstrap";
-    const items = ref(JSON.parse(localStorage.getItem("items")) || []);
-    const deleteId = ref(null);
-    const deleteItemData = ref(null);
-    const deleteModal = ref(null);
-    let modal = null;
 
-    onMounted(() => {
-      modal = new Modal(deleteModal.value);
-    });
+  import { ref, onMounted, onUnmounted } from "vue";
+  import { statuses } from "@/const/status";
+  import { Modal } from "bootstrap";
 
-    const idAsc = ref(true);
-    const dateAsc = ref(true);
+  const items = ref([]);
+  const deleteItemData = ref(null);
+  const deleteModal = ref(null);
 
-    function sortById() {
-      items.value.sort((a, b) =>
-        idAsc.value ? a.id - b.id : b.id - a.id
-      );
+  let modal = null;
 
-      idAsc.value = !idAsc.value;
+  function loadItems() {
+    items.value = JSON.parse(localStorage.getItem("items")) || []; 
+  }
+
+  function saveItems() {
+    localStorage.setItem("items", JSON.stringify(items.value));
+    window.dispatchEvent(new Event("todo-updated"));
+  }
+
+  onMounted(() => {
+    loadItems();
+    modal = new Modal(deleteModal.value);
+    window.addEventListener("todo-updated", loadItems);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener("todo-updated", loadItems);
+  });
+
+  const idAsc = ref(true);
+  const dateAsc = ref(true);
+
+  function sortById() {
+    items.value.sort((a, b) =>
+      idAsc.value ? a.id - b.id : b.id - a.id
+    );
+
+    idAsc.value = !idAsc.value;
+  }
+
+  function sortByDate() {
+    items.value.sort((a, b) =>
+      dateAsc.value
+        ? new Date(a.limit) - new Date(b.limit)
+        : new Date(b.limit) - new Date(a.limit)
+    );
+
+    dateAsc.value = !dateAsc.value;
+  }
+
+  function onEdit(item) {
+    if (!item.onEdit) {
+      item.onEdit = true;
+      return;
     }
+    item.onEdit = false;
+    saveItems();
+  }
 
-    function sortByDate() {
-      items.value.sort((a, b) =>
-        dateAsc.value
-          ? new Date(a.limit) - new Date(b.limit)
-          : new Date(b.limit) - new Date(a.limit)
-      );
+  function showDeleteModal(id) {
+    deleteItemData.value = item.value.find(item => item.id === id);
+    modal.show();
+  }
 
-      dateAsc.value = !dateAsc.value;
-    }
+  function deleteItem() {
+    items.value = items.value.filter(
+      item => item.id !== deleteItemData.value.id
+    );
 
-    function onEdit(item) {
-      if (!item.onEdit) {
-        item.onEdit = true;
-      } else {
-        item.onEdit = false;
-        localStorage.setItem("items",JSON.stringify(items.value));
-      }
-    }
+    saveItems();
 
-    function deleteItem() {
-      items.value = items.value.filter(
-        item => item.id !== deleteItemData.value.id
-      );
+    deleteItemData.value = null;
 
-      localStorage.setItem("items", JSON.stringify(items.value));
+    modal.hide();
+  }
 
-      deleteItemData.value = null;
-
-      modal.hide();
-    }
-
-    function showDeleteModal(id) {
-      const item = items.value.find(item => item.id === id);
-
-      deleteId.value = id;
-      deleteItemData.value = item;
-
-      modal.show();
-    }
 </script>
