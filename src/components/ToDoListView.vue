@@ -2,6 +2,8 @@
   <div class="container mt-4">
     <h2 class="mb-3">ToDoリスト</h2>
 
+    <TodoSearch v-model="searchKeyword" />
+
     <table v-if="items.length > 0"　class="table table-striped table-bordered table-hover align-middle text-center">
       <thead class="table-dark">
         <tr>
@@ -77,10 +79,12 @@
   import { ref, onMounted, onUnmounted } from "vue";
   import { statuses } from "@/const/status";
   import { Modal } from "bootstrap";
+  import TodoSearch from "./TodoSearch.vue";
 
   const items = ref([]);
   const deleteItemData = ref(null);
   const deleteModal = ref(null);
+  const searchKeyword = ref("");
 
   let modal = null;
 
