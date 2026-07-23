@@ -1,23 +1,26 @@
 <template>
   <div class="container mt-5">
     <div v-if="isErrorMsg" class="alert alert-danger" role="alert">
-      やるタスク・期間の両方を入力してください。
+      タスク名と期限を入力してください。
     </div>
     <div class="card shadow">
       <div class="card-header bg-primary text-white">
-        <h3 class="mb-0">ToDo App</h3>
+        <h3 class="mb-0">📋 ToDoタスク管理アプリ</h3>
+          <p class="mb-0 mt-2 small">
+            タスクの登録・編集・削除・検索ができます。
+          </p>
       </div>
       <div class="card-body">
         <form @submit.prevent="onSubmitForm">
           <div class="mb-3">
-            <label class="form-label">やること</label>
-            <input type="text" class="form-control" v-model="input" placeholder="やることを入力してください" />
+            <label class="form-label fw-bold">タスク名</label>
+            <input type="text" class="form-control" v-model="input" placeholder="例：Vue.jsの勉強" />
           </div>
           <div class="mb-3">
-            <label class="form-label">期間</label>
+            <label class="form-label fw-bold">期限</label>
             <input type="date" class="form-control" v-model="inputDate" />
           </div>
-          <button class="btn btn-primary w-100">登録</button>
+          <button class="btn btn-primary w-100">＋ タスクを登録</button>
         </form>
       </div>
     </div>
@@ -58,7 +61,7 @@
     const items = getItems();
 
     const newItem = {
-      id: items.length > 0 ? ? Math.max(...items.map(item => item.id)) + 1 : 1,
+      id: items.length > 0 ? Math.max(...items.map(item => item.id)) + 1 : 1,
       content: input.value,
       limit: inputDate.value,
       state: status.NOT_START,

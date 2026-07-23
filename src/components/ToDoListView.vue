@@ -1,23 +1,32 @@
 <template>
   <div class="container mt-4">
-    <h2 class="mb-3">ToDoリスト</h2>
-
-    <TodoSearch v-model="searchKeyword" />
-
-    <table v-if="items.length > 0"　class="table table-striped table-bordered table-hover align-middle text-center">
+    <h2 class="fw-bold">📋 登録済みタスク一覧</h2>
+    <p class="text-muted">
+      登録したタスクを確認・編集・削除できます。
+    </p>
+    <div class="mb-3">
+      <label class="form-label fw-bold">
+        タスクを検索
+      </label>
+      <TodoSearch v-model="searchKeyword" />
+    </div>
+    <p class="text-end text-muted mb-2">
+      全 {{ filteredItems.length }} 件
+    </p>
+    <table v-if="filteredItems.length > 0"　class="table table-hover table-striped align-middle text-center shadow-sm"">
       <thead class="table-dark">
         <tr>
           <th @click="sortById" style="cursor:pointer"> ID ▲▼</th>
-          <th>やること</th>
-          <th @click="sortByDate" style="cursor:pointer">期間 ▲▼</th>
-          <th>状態</th>
+          <th>タスク名</th>
+          <th @click="sortByDate" style="cursor:pointer">期限 ▲▼</th>
+          <th>進捗</th>
           <th>編集</th>
           <th>削除</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr v-for="item in items" :key="item.id">
+        <tr v-for="item in filteredItems" :key="item.id">
           <td>{{ item.id }}</td>
           <td>
             <span v-if="!item.onEdit">{{ item.content }}</span>
@@ -48,7 +57,7 @@
     </table>
     <!-- データがない場合 -->
     <div v-else class="alert alert-info text-center">
-      リストデータがありません。
+      該当するタスクがありません。
     </div>
   </div>
   <div class="modal fade" id="deleteModal" tabindex="-1" ref="deleteModal">
@@ -76,7 +85,7 @@
 
 <script setup>
 
-  import { ref, onMounted, onUnmounted } from "vue";
+  import { ref, computed, onMounted, onUnmounted } from "vue";
   import { statuses } from "@/const/status";
   import { Modal } from "bootstrap";
   import TodoSearch from "./TodoSearch.vue";
@@ -87,6 +96,14 @@
   const searchKeyword = ref("");
 
   let modal = null;
+
+  const filteredItems = computed(() => {
+    return items.value.filter(item =>
+      item.content
+        .toLowerCase()
+        .includes(searchKeyword.value.toLowerCase())
+    );
+  });
 
   function loadItems() {
     items.value = JSON.parse(localStorage.getItem("items")) || []; 
@@ -138,7 +155,7 @@
   }
 
   function showDeleteModal(id) {
-    deleteItemData.value = item.value.find(item => item.id === id);
+    deleteItemData.value = items.value.find(item => item.id === id);
     modal.show();
   }
 
